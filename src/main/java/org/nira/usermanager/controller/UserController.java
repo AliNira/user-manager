@@ -1,5 +1,6 @@
 package org.nira.usermanager.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nira.usermanager.dto.UserDto;
 import org.nira.usermanager.service.UserService;
@@ -17,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
         UserDto userCreated = userService.createUser(userDto);
         return new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
@@ -37,7 +38,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable("id") Long userId,
-            @RequestBody UserDto userDto) {
+            @RequestBody @Valid UserDto userDto) {
         userDto.setId(userId);
         UserDto userUpdated = userService.updateUser(userDto);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
