@@ -5,12 +5,13 @@ import org.nira.usermanager.dto.UserDto;
 import org.nira.usermanager.entity.User;
 import org.nira.usermanager.exception.EmailAlreadyExistsException;
 import org.nira.usermanager.exception.ResourceNotFoundException;
-import org.nira.usermanager.mapper.AutoUserMapper;
 import org.nira.usermanager.repository.UserRepository;
 import org.nira.usermanager.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.nira.usermanager.mapper.AutoUserMapper.MAPPER;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +24,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()){
             throw new EmailAlreadyExistsException("Email already exists");
         }
-        User user = AutoUserMapper.MAPPER.mapToUser(userDto);
+        User user = MAPPER.mapToUser(userDto);
         User savedUser = userRepository.save(user);
-        UserDto savedUserDto = AutoUserMapper.MAPPER.mapToUserDto(savedUser);
+        UserDto savedUserDto = MAPPER.mapToUserDto(savedUser);
         return savedUserDto;
     }
 
@@ -33,14 +34,14 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        return AutoUserMapper.MAPPER.mapToUserDto(user);
+        return MAPPER.mapToUserDto(user);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(AutoUserMapper.MAPPER::mapToUserDto)
+                .map(MAPPER::mapToUserDto)
                 .toList();
     }
 
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setLastName(userDto.getLastName());
         existingUser.setEmail(userDto.getEmail());
         User updatedUser = userRepository.save(existingUser);
-        return AutoUserMapper.MAPPER.mapToUserDto(updatedUser);
+        return MAPPER.mapToUserDto(updatedUser);
     }
 
     @Override
