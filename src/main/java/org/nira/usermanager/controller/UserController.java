@@ -2,7 +2,8 @@ package org.nira.usermanager.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.nira.usermanager.dto.UserDto;
+import org.nira.usermanager.dto.UserRequestDto;
+import org.nira.usermanager.dto.UserResponseDto;
 import org.nira.usermanager.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,29 +19,28 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
-        UserDto userCreated = userService.createUser(userDto);
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid UserRequestDto userRequestDto) {
+        UserResponseDto userCreated = userService.createUser(userRequestDto);
         return new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long id) {
-        UserDto userDto = userService.getUserById(id);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") Long id) {
+        UserResponseDto userRequestDto = userService.getUserById(id);
+        return new ResponseEntity<>(userRequestDto, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers() {
-        List<UserDto> users = userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDto>> getUsers() {
+        List<UserResponseDto> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(
+    public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable("id") Long userId,
-            @RequestBody @Valid UserDto userDto) {
-        userDto.setId(userId);
-        UserDto userUpdated = userService.updateUser(userDto);
+            @RequestBody @Valid UserRequestDto userRequestDto) {
+        UserResponseDto userUpdated = userService.updateUser(userId, userRequestDto);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
