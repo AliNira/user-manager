@@ -1,7 +1,8 @@
 package org.nira.usermanager.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.nira.usermanager.dto.UserDto;
+import org.nira.usermanager.dto.UserRequestDto;
+import org.nira.usermanager.dto.UserResponseDto;
 import org.nira.usermanager.entity.User;
 import org.nira.usermanager.exception.EmailAlreadyExistsException;
 import org.nira.usermanager.exception.ResourceNotFoundException;
@@ -20,40 +21,47 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()){
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        emailExistence(userRequestDto);
+        User user = MAPPER.mapToUser(userRequestDto);
+        User savedUser = userRepository.save(user);
+        UserResponseDto savedUserResponseDto = MAPPER.mapToUserResponseDto(savedUser);
+        return savedUserResponseDto;
+    }
+
+    private void emailExistence(UserRequestDto userRequestDto) {
+        if (userRepository.findByEmail(userRequestDto.getEmail()).isPresent()){
             throw new EmailAlreadyExistsException("Email already exists");
         }
-        User user = MAPPER.mapToUser(userDto);
-        User savedUser = userRepository.save(user);
-        UserDto savedUserDto = MAPPER.mapToUserDto(savedUser);
-        return savedUserDto;
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        return MAPPER.mapToUserDto(user);
+        return MAPPER.mapToUserResponseDto(user);
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(MAPPER::mapToUserDto)
+                .map(MAPPER::mapToUserResponseDto)
                 .toList();
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto) {
-        User existingUser = userRepository.findById(userDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userDto.getId()));
-        existingUser.setFirstName(userDto.getFirstName());
-        existingUser.setLastName(userDto.getLastName());
-        existingUser.setEmail(userDto.getEmail());
+    public UserResponseDto updateUser(Long userId, UserRequestDto userRequestDto) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        existingUser.setFirstName(userRequestDto.getFirstName());
+        existingUser.setLastName(userRequestDto.getLastName());
+        if (!userRequestDto.getEmail().equals(existingUser.getEmail())){
+            emailExistence(userRequestDto);
+            existingUser.setEmail(userRequestDto.getEmail());
+        }
         User updatedUser = userRepository.save(existingUser);
-        return MAPPER.mapToUserDto(updatedUser);
+        return MAPPER.mapToUserResponseDto(updatedUser);
     }
 
     @Override

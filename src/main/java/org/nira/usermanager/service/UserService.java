@@ -1,18 +1,19 @@
 package org.nira.usermanager.service;
 
-import org.nira.usermanager.dto.UserDto;
+import org.nira.usermanager.dto.UserRequestDto;
+import org.nira.usermanager.dto.UserResponseDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserDto createUser(UserDto userDto);
+    UserResponseDto createUser(UserRequestDto userRequestDto);
 
-    UserDto getUserById(Long userId);
+    UserResponseDto getUserById(Long userId);
 
-    List<UserDto> getAllUsers();
+    List<UserResponseDto> getAllUsers();
 
-    UserDto updateUser(UserDto userDto);
+    UserResponseDto updateUser(Long userId, UserRequestDto userRequestDto);
 
     void deleteUser(Long userId);
 }

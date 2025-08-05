@@ -11,9 +11,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserRequestDto {
 
-    private Long id;
     @NotEmpty(message = "user first name shouldn't be null or empty")
     private String firstName;
     @NotEmpty(message = "User last name shouldn't be null or empty")
